@@ -1,36 +1,23 @@
+import java.util.*;
+
 class Solution {
     public int solution(int[][] triangle) {
+        int h = triangle.length;
+        int[][] dp = new int[h][h];
 
-        for (int i = 1; i < triangle.length; i++) {
-            for (int j = 0; j < triangle[i].length; j++) {
-
-                // 맨 왼쪽은 왼쪽 위에서만 올 수 있음
-                if (j == 0) {
-                    triangle[i][j] += triangle[i - 1][j];
-                }
-
-                // 맨 오른쪽은 오른쪽 위에서만 올 수 있음
-                else if (j == triangle[i].length - 1) {
-                    triangle[i][j] += triangle[i - 1][j - 1];
-                }
-
-                // 가운데는 왼쪽 위와 오른쪽 위 중 큰 값 선택
-                else {
-                    triangle[i][j] += Math.max(
-                        triangle[i - 1][j - 1],
-                        triangle[i - 1][j]
-                    );
-                }
+        for (int x = 0; x < h; x++) {
+            dp[h - 1][x] = triangle[h - 1][x];
+        }
+        
+        for (int y = h-2; y >= 0; y--){
+            for (int x = 0; x <= y; x++){
+                int left = dp[y+1][x];
+                int right = dp[y+1][x+1];
+                
+                dp[y][x] = triangle[y][x] + Math.max(left, right);
             }
         }
 
-        int answer = 0;
-        int last = triangle.length - 1;
-
-        for (int i = 0; i < triangle[last].length; i++) {
-            answer = Math.max(answer, triangle[last][i]);
-        }
-
-        return answer;
+        return dp[0][0];
     }
 }
