@@ -18,6 +18,7 @@
 7. 복습은 D0 / D1 / D3 / D7 일정으로 진행한다.
 8. 문제 수보다 무힌트 재현 여부를 진도 기준으로 삼는다.
 9. 작성한 뼈대의 잘못된 문장은 삭제하지 않고 `~~기존 문장~~ → 수정 문장`으로 교정 이력을 남긴다.
+10. 뼈대에 잘못된 내용이 있으면 GitHub에 교정한 뒤, 다음 문제를 내기 전에 잘못된 부분과 수정 이유를 사용자에게 먼저 설명한다.
 
 ### 힌트 단계
 
@@ -136,7 +137,7 @@ Java/API 검색: 없음 / 있음(J, 검색 내용)
 | 8/3 | 완주하지 못한 선수 (42576), HashMap | 통과 | 10분 | H0, J | 방식 1 성공 | - |
 | 8/3 | 완주하지 못한 선수 (42576), 정렬 | 통과 | 10분 | H0, 검색 없음 | 방식 2 성공 | - |
 | 8/3 | 폰켓몬 (1845) | 통과 | 8분 | H0, 검색 없음 | A | D7 8/10 |
-| 8/4 | JadenCase 문자열 만들기 (12951) | 1차 구현 | 11분 | H0, J | StringBuilder 첫 학습 | 진행 중 |
+| 8/4 | JadenCase 문자열 만들기 (12951) | 안내 구현 통과 | 11분+학습 | H0, J | StringBuilder 적용 성공 | D0 재구현 대기 |
 
 ---
 
@@ -645,7 +646,7 @@ return Math.min(set.size(), nums.length / 2);
 Java/API 검색: 있음(J)
 검색 내용: String.toLowerCase()
 기존 코드 열람: 없음
-학습 상태: StringBuilder를 처음 접함. 사용법을 학습한 뒤 재작성 예정
+학습 상태: StringBuilder를 처음 접한 뒤 사용법을 보면서 재작성 성공
 최종 등급: 재작성 후 확정
 ```
 
@@ -738,24 +739,41 @@ class Solution {
 }
 ```
 
+### StringBuilder 안내 구현 코드
+
+```java
+class Solution {
+    public String solution(String s) {
+        StringBuilder answer = new StringBuilder();
+        String lower = s.toLowerCase();
+
+        for (int i = 0; i < lower.length(); i++) {
+            if (i == 0) {
+                answer.append(Character.toUpperCase(lower.charAt(i)));
+            } else if (lower.charAt(i - 1) == ' ') {
+                answer.append(Character.toUpperCase(lower.charAt(i)));
+            } else {
+                answer.append(lower.charAt(i));
+            }
+        }
+
+        return answer.toString();
+    }
+}
+```
+
+안내 구현의 시간복잡도는 O(n), 공간복잡도는 O(n)이다.
+
 ---
 
 ## 다음 과제
 
-### JadenCase StringBuilder 재작성
+### JadenCase StringBuilder D0 재구현
 
 ```text
-1단계: 아래 API를 보면서 기존 코드를 StringBuilder로 변경
-1단계 시간: 평가하지 않음
+제한 시간: 5분
+방금 작성한 코드와 API 예시: 모두 닫기
 기존 알고리즘: 그대로 사용
-목표: String 연결만 StringBuilder로 교체
-2단계: 동작 확인 후 코드를 닫고 5분 안에 다시 작성
-```
-
-기억할 API:
-
-```java
-StringBuilder answer = new StringBuilder();
-answer.append(/* 변환한 문자 */);
-return answer.toString();
+검색: 금지
+통과 기준: StringBuilder 생성, append, toString을 기억해 제출 통과
 ```
