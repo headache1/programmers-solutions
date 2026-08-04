@@ -140,7 +140,7 @@ Java/API 검색: 없음 / 있음(J, 검색 내용)
 | 8/3 | 폰켓몬 (1845) | 통과 | 8분 | H0, 검색 없음 | A | D7 8/10 |
 | 8/4 | JadenCase 문자열 만들기 (12951) | D0 통과 | 최초 11분, D0 4분 | H0, J | 알고리즘 A / Java 도구 D0 성공 | StringBuilder D1 8/5 |
 | 8/4 | 정수 삼각형 (43105) | D1 통과 | 7분 | H0, 검색 없음 | 구현·설명·경계 테스트 성공 | D3 8/6, D7 8/10 |
-| 8/4 | 전화번호 목록 (42577) | H3 안내 구현 통과 | 안내 전 30분+, 안내 후 3분 | J(substring), H3 | D 후보 | D0 재구현 대기 |
+| 8/4 | 전화번호 목록 (42577) | D0 통과 | 안내 전 30분+, D0 5분 | J(substring), H3 | D | D1 8/5, D3 8/7, D7 8/11 |
 
 ---
 
@@ -1163,31 +1163,81 @@ HashSet-only 방식의 시간은 Java substring 생성과 해시 계산을 포�
 
 ---
 
-## 다음 과제
-
-### 전화번호 목록 H3 후 D0 재구현
+### D0 빈 화면 재구현
 
 ```text
-제한 시간: 20분
-H3 설명과 현재 코드: 모두 닫기
-검색: 금지
-Arrays.sort: 사용 금지
-Set 전체 순회: 사용 금지
-통과 기준: 프로그래머스 정확성·효율성 전체 통과
+시간: 5분
+결과: 프로그래머스 정확성·효율성 전체 통과
+검색: 없음
+코드·설명 열람: 없음
+판정: D0 성공
+최종 등급: D
+복습: D1 8/5, D3 8/7, D7 8/11
+주의: 코드 아래의 주석은 이전 초안이므로 D0 평가에서 제외
 ```
 
-코딩 전 확인:
+```java
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        HashSet<String> set = new HashSet<>();
+
+        for (int i = 0; i < phone_book.length; i++) {
+            set.add(phone_book[i]);
+        }
+
+        for (int i = 0; i < phone_book.length; i++) {
+            int len = phone_book[i].length();
+
+            for (int j = 1; j < len; j++) {
+                if (set.contains(phone_book[i].substring(0, j))) {
+                    return false;
+                }
+            }
+        }
+
+        return answer;
+    }
+}
+```
+
+`answer`는 항상 `true`인 상태로 마지막에만 사용되므로 `return true`로 바꾸면 더 단순하지만, 현재 코드도 정확하다.
+
+---
+
+## 다음 과제
+
+### 전화번호 목록 정렬-only 비교 구현
 
 ```text
+목적: HashSet 방식과 정렬 방식의 구조·복잡도 비교
+제한 시간: 15분
+HashSet: 사용 금지
+Arrays.sort: 사용 가능
+기존 HashSet 코드: 열람 금지
+Java API 검색: 가능하지만 사용하면 J 기록
+```
+
+코딩 전 뼈대:
+
+```text
+[전화번호 목록 42577 / 정렬 방식]
+
 상태 / 자료구조:
-모든 전체 전화번호를 저장한 HashSet
+
+정렬 후 어떤 번호 쌍을 검사할지:
+
+왜 그 번호 쌍만 검사해도 되는지:
 
 불변식:
-접두어 검사 전에 모든 전체 번호가 Set에 있다.
+
+종료 조건:
 
 시간 / 공간 복잡도:
-시간 O(n × L²), 공간 O(n)
 
 확인할 경계:
-j는 1부터 len-1까지 / 전체 문자열은 자기 자신이므로 검사하지 않음
+번호 1개 / 접두어 관계가 있는 두 번호 /
+앞부분을 공유하지만 접두어가 아닌 두 번호
 ```
