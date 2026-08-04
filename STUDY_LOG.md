@@ -140,7 +140,7 @@ Java/API 검색: 없음 / 있음(J, 검색 내용)
 | 8/3 | 폰켓몬 (1845) | 통과 | 8분 | H0, 검색 없음 | A | D7 8/10 |
 | 8/4 | JadenCase 문자열 만들기 (12951) | D0 통과 | 최초 11분, D0 4분 | H0, J | 알고리즘 A / Java 도구 D0 성공 | StringBuilder D1 8/5 |
 | 8/4 | 정수 삼각형 (43105) | D1 통과 | 7분 | H0, 검색 없음 | 구현·설명·경계 테스트 성공 | D3 8/6, D7 8/10 |
-| 8/4 | 전화번호 목록 (42577) | 1차 구현 | 18분 | H0, J(substring) | A(J) 후보 / 혼합 구현 정리 필요 | 제출 확인·리팩터링 대기 |
+| 8/4 | 전화번호 목록 (42577) | H3 안내 구현 | 안내 전 30분+, 안내 후 3분 | J(substring), H3 | D 후보 | D0 재구현 대기 |
 
 ---
 
@@ -1059,23 +1059,135 @@ class Solution {
 
 ---
 
-## 다음 문제 전 정리
-
-현재 코드는 맞지만 설계와 구현을 일치시키기 위해 두 방법 중 하나로 정리한다.
+### HashSet 전체 순회 시도와 효율성 실패
 
 ```text
-선택 1: HashSet만 사용하고 정렬 제거
-선택 2: 정렬만 사용하고 HashSet 제거
+안내 전 누적 시간: 30분 이상
+정확성: 모두 통과
+효율성: 테스트 3, 4 시간 초과
+총점: 91.7 / 100
+원인: 각 전화번호마다 for (String x : set)으로 Set 전체를 순회해 O(n² × L)
 ```
 
-먼저 유지할 방법 하나를 고른 뒤 아래 세 줄을 작성한다.
+```java
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        HashSet<String> set = new HashSet<>();
+
+        for (int i = 0; i < phone_book.length; i++) {
+            if (answer == false) {
+                break;
+            }
+
+            for (String x : set) {
+                if ((x.length() <= phone_book[i].length()
+                        && phone_book[i].substring(0, x.length()).equals(x))
+                        || (x.length() > phone_book[i].length()
+                        && x.substring(0, phone_book[i].length()).equals(phone_book[i]))) {
+                    answer = false;
+                }
+            }
+
+            set.add(phone_book[i]);
+        }
+
+        return answer;
+    }
+}
+```
+
+HashSet을 사용했더라도 Set 전체를 반복하면 조회 이점을 얻지 못한다. `set.contains(candidate)`는 평균 O(1)이지만 `for (String x : set)`은 O(set.size())이다.
+
+### H3 핵심 관찰
+
+현재 전화번호를 Set 안의 모든 번호와 비교하지 않는다. 모든 전체 전화번호를 먼저 Set에 넣은 뒤, 현재 번호에서 가능한 올바른 접두어만 만들어 `contains`로 직접 조회한다.
+
+### H3 안내 구현
 
 ```text
-유지할 방법:
+설명 후 구현 시간: 3분
+추가 검색: 없음
+알고리즘 힌트: H3
+결과: 논리적으로 정답
+등급 후보: D
+D0 빈 화면 재구현: 대기
+```
 
+```java
+import java.util.*;
+
+class Solution {
+    public boolean solution(String[] phone_book) {
+        boolean answer = true;
+        HashSet<String> set = new HashSet<>();
+
+        for (int i = 0; i < phone_book.length; i++) {
+            set.add(phone_book[i]);
+        }
+
+        for (int i = 0; i < phone_book.length; i++) {
+            if (answer == false) {
+                break;
+            }
+
+            int len = phone_book[i].length();
+
+            for (int j = 0; j < len; j++) {
+                if (set.contains(phone_book[i].substring(0, j))) {
+                    answer = false;
+                }
+            }
+        }
+
+        return answer;
+    }
+}
+```
+
+이 구현은 맞지만 다음 두 부분을 정리할 수 있다.
+
+- `j = 0`은 빈 문자열을 검사하므로 `j = 1`부터 시작한다.
+- 접두어를 발견하면 `answer`를 바꾸고 나중에 반복문을 끝내기보다 곧바로 `return false`한다.
+
+수정된 핵심 불변식은 다음과 같다.
+
+```text
+접두어 검사를 시작하기 전에 모든 전체 전화번호가 Set에 들어 있다.
+현재 번호에 대해 지금까지 만든 모든 proper prefix가 Set에 있는지 확인했다.
+```
+
+HashSet-only 방식의 시간은 Java substring 생성과 해시 계산을 포함해 O(n × L²), 추가 공간은 O(n)이다. `L <= 20`이므로 실질적으로 선형에 가깝다.
+
+---
+
+## 다음 과제
+
+### 전화번호 목록 H3 후 D0 재구현
+
+```text
+제한 시간: 20분
+H3 설명과 현재 코드: 모두 닫기
+검색: 금지
+Arrays.sort: 사용 금지
+Set 전체 순회: 사용 금지
+통과 기준: 프로그래머스 정확성·효율성 전체 통과
+```
+
+코딩 전 확인:
+
+```text
 상태 / 자료구조:
+모든 전체 전화번호를 저장한 HashSet
 
 불변식:
+접두어 검사 전에 모든 전체 번호가 Set에 있다.
 
-예상 시간 / 공간 복잡도:
+시간 / 공간 복잡도:
+시간 O(n × L²), 공간 O(n)
+
+확인할 경계:
+j는 1부터 len-1까지 / 전체 문자열은 자기 자신이므로 검사하지 않음
 ```
