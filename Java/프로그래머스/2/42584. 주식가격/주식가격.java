@@ -1,48 +1,52 @@
+import java.util.*;
+
 class Solution {
     public int[] solution(int[] prices) {
+        Deque <Integer> stack = new ArrayDeque<>();
         int[] answer = new int[prices.length];
-        answer[prices.length-1] = 0;
-        for (int i = 0; i < prices.length-1; i++){
-            answer[i] = prices.length-1-i;
-            for (int j = 1; j + i < prices.length; j++){
-                if (prices[i] > prices[i+j]){
-                    answer[i] = j;
-                    break;
-                }
+        for (int i = 0; i < prices.length; i++){
+            while (!stack.isEmpty() && prices[stack.peek()] > prices[i]){
+                int previous = stack.pop();
+                answer[previous] = i - previous;
+            }
+            stack.push(i);
+
+        }
+        for (int i = 0; i < answer.length; i++){
+            if (answer[i] == 0){
+                answer[i] = answer.length-i-1;
             }
         }
         return answer;
     }
 }
 
-
-
-
 /*
-[주식가격 42584]
 
-43232
-11210
-과거 풀이 여부: 없음
-목표: 가격 하강 시간에 대한 리스트 반환
+43213
+11110
 
-순서 / 중복 / 연속성: 순서, 연속성은 중요
+문제: 주식가격 (42584)
+모드: 재현 진단
+시작 시각: 11:50
+과거 접촉: 없음
+힌트: H0
 
-최대 입력과 O(n²) 예상 연산량: O(n)
+answer[i]의 의미: 가격이 떨어지기까지 걸린 시간
+________________________________
 
 단순 풀이:
+________________________________
 
-상태 / 자료구조: 큐
+prices.length 최대치: 100,000
+________________________________
 
-한 단계마다 바뀌는 것:
- 
-불변식:
+단순 풀이의 최악 연산량: 100,000^2
+________________________________
 
-종료 조건과 반환값:
+답이 확정되는 순간: 
+________________________________
 
-시간 / 공간 복잡도:
-
-확인할 예외:
-가격이 끝까지 떨어지지 않음 / 바로 다음 초에 떨어짐 /
-마지막 원소 / 같은 가격이 연속됨
+후보 자료구조와 이유:
+________________________________
 */
